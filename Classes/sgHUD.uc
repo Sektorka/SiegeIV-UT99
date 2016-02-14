@@ -97,6 +97,37 @@ var() class<Inventory> CacheInvs[10];
 var() int CacheTypes[10];
 var() int iCacheInvs;
 
+var() sgClient ClientActor;
+
+//showtime by Sektor based on Higor
+simulated exec function ShowTime()
+{
+	ClientActor.ToggleTime();
+}
+
+simulated final function bool LocalOwner()
+{
+	return (PlayerPawn(Owner) != none) && (ViewPort(PlayerPawn(Owner).Player) != none);
+}
+
+simulated final function bool FindClientActor()
+{
+	local sgClient aC;
+	
+	if ( ClientActor != none )
+		return true;
+	if ( LocalOwner() )
+	{
+		ForEach AllActors ( class'sgClient', aC)
+		{
+			ClientActor = aC;
+			return true;
+		}
+		ClientActor = Spawn( class'sgClient');
+		return true;
+	}
+}
+
 simulated function CacheInventory()
 {
 	local inventory Inv;
@@ -1451,7 +1482,7 @@ simulated function DrawStatus(Canvas Canvas)
 	local Bot BotOwner;
 	local TournamentPlayer TPOwner;
 	local texture Doll, DollBelt;
-	local float XL,YL;
+	local float XL,YL, stY;
 	
 	ArmorAmount = 0;
 	CurAbs = 0;
@@ -1630,15 +1661,23 @@ simulated function DrawStatus(Canvas Canvas)
         
 	
 		//Draw time by Sektor based on Higor timer
-		X = Canvas.ClipX - 128 * StatScale - 131 * Scale * Scale;
-        Y = 128 * Scale;
+		if ( FindClientActor() && ClientActor.bShowTime )
+		{
+
+			X = Canvas.ClipX - 128 * StatScale - 131 * Scale * Scale;
+        	Y = 128 * Scale;
 		
-		Canvas.DrawColor = HUDColor;
-		Canvas.SetPos(X,Y);
-        Canvas.DrawTile(Texture'HUD_ClockBg', 128*Scale, 60*Scale, 0, 0, 128.0, 64.0);
-        Canvas.Style = Style;
-        Canvas.DrawColor = WhiteColor;
-        DrawTime(Canvas, X+3, Y);
+			Canvas.DrawColor = HUDColor;
+			Canvas.SetPos(X,Y);
+        	Canvas.DrawTile(Texture'HUD_ClockBg', 128*Scale, 60*Scale, 0, 0, 128.0, 64.0);
+        	Canvas.Style = Style;
+        	Canvas.DrawColor = WhiteColor;
+        	DrawTime(Canvas, X+3, Y);
+			stY = 64;
+		}
+		else{
+			stY = 0;
+		}
 		//end Driwe time
 
 		// Draw in front of Frags
@@ -1654,11 +1693,11 @@ simulated function DrawStatus(Canvas Canvas)
         }
 
 		Canvas.DrawColor = HUDColor;
-        Canvas.SetPos(X,Y+64);
+        Canvas.SetPos(X,Y+stY);
         Canvas.DrawTile(Texture'HUD_ClockBg', 128*Scale + XL * Scale, 64*Scale, 0, 0, 128.0, 64.0);
         Canvas.Style = Style;
         Canvas.DrawColor = WhiteColor;
-        DrawTimer(Canvas, X, Y+64, i, XL);
+        DrawTimer(Canvas, X, Y+stY, i, XL);
 
 		
 	}
@@ -1990,58 +2029,57 @@ simulated function Color NewColor( byte r, byte g, byte b )
 	CreatedColor.b = b;
 	return CreatedColor;
 }
-
 defaultproperties
 {
-     GreyColor=(R=128,G=128,B=128)
-     RedColour=128
-     TheWhiteStuff=(R=255,G=255,B=255)
-     nHUDDecPlaces=1
-     sgRanks(0)="Top BaseCore attacker"
-     sgRanks(1)="Top BaseCore defender"
-     sgRanks(2)="Top attacker"
-     sgRanks(3)="Top player killer"
-     sgRanks(4)="Top builder"
-     sgRanks(5)="Top Warhead maker"
-     sgRanks(6)="Top Warhead defender"
-     sgRanks(7)="Top team player"
-     sgRankDesc(0)="The player who caused most BaseCore damage"
-     sgRankDesc(1)="The player who repaired the BaseCore the most"
-     sgRankDesc(2)="The player who caused the most building damage"
-     sgRankDesc(3)="The player who killed more than any other"
-     sgRankDesc(4)="The player who built the greatest number of buildings"
-     sgRankDesc(5)="The player who built the greatest number of warheads"
-     sgRankDesc(6)="The player who killed the greatest number of warheads"
-     sgRankDesc(7)="The player who repaired and upgraded the most"
-     TeamIcons(0)=Texture'sgUMedia.Icons.IconCoreRed'
-     TeamIcons(1)=Texture'sgUMedia.Icons.IconCoreBlue'
-     TeamIcons(2)=Texture'sgUMedia.Icons.IconCoreGreen'
-     TeamIcons(3)=Texture'sgUMedia.Icons.IconCoreGold'
-     HudItemSlotSpace=36.000000
-     bSeeAllHeat=True
-     bSeeBehindWalls=True
-     AffectedActorsClass=Class'Engine.Pawn'
-     ExcludedClass=StationaryPawn
-     HeatClass=Class'SiegeIV_0022.sgHeatBlue'
-     HeatSensingRange=16384.000000
-     bVisorDeActivated=True
-     CacheInvs(0)=Class'Botpack.UT_invisibility'
-     CacheInvs(1)=Class'UnrealI.Dampener'
-     CacheInvs(2)=Class'Botpack.UT_Jumpboots'
-     CacheInvs(3)=Class'Botpack.UDamage'
-     CacheInvs(4)=Class'SiegeIV_0022.sgSpeed'
-     CacheInvs(5)=Class'UnrealShare.SCUBAGear'
-     CacheInvs(6)=Class'SiegeIV_0022.sgSuit'
-     CacheInvs(7)=Class'UnrealShare.Suits'
-     CacheInvs(8)=Class'SiegeIV_0022.sgTeleNetwork'
-     CacheInvs(9)=Class'SiegeIV_0022.sgVisor'
-     CacheTypes(1)=1
-     CacheTypes(2)=2
-     CacheTypes(3)=3
-     CacheTypes(4)=4
-     CacheTypes(5)=5
-     CacheTypes(6)=6
-     CacheTypes(7)=7
-     CacheTypes(8)=8
-     CacheTypes(9)=9
+    GreyColor=(R=128,G=128,B=128,A=0),
+    RedColour=128
+    TheWhiteStuff=(R=255,G=255,B=255,A=0),
+    nHUDDecPlaces=1
+    sgRanks(0)="Top BaseCore attacker"
+    sgRanks(1)="Top BaseCore defender"
+    sgRanks(2)="Top attacker"
+    sgRanks(3)="Top player killer"
+    sgRanks(4)="Top builder"
+    sgRanks(5)="Top Warhead maker"
+    sgRanks(6)="Top Warhead defender"
+    sgRanks(7)="Top team player"
+    sgRankDesc(0)="The player who caused most BaseCore damage"
+    sgRankDesc(1)="The player who repaired the BaseCore the most"
+    sgRankDesc(2)="The player who caused the most building damage"
+    sgRankDesc(3)="The player who killed more than any other"
+    sgRankDesc(4)="The player who built the greatest number of buildings"
+    sgRankDesc(5)="The player who built the greatest number of warheads"
+    sgRankDesc(6)="The player who killed the greatest number of warheads"
+    sgRankDesc(7)="The player who repaired and upgraded the most"
+    TeamIcons(0)=Texture'sgUMedia.Icons.IconCoreRed'
+    TeamIcons(1)=Texture'sgUMedia.Icons.IconCoreBlue'
+    TeamIcons(2)=Texture'sgUMedia.Icons.IconCoreGreen'
+    TeamIcons(3)=Texture'sgUMedia.Icons.IconCoreGold'
+    HudItemSlotSpace=36.00
+    bSeeAllHeat=True
+    bSeeBehindWalls=True
+    AffectedActorsClass=Class'Engine.Pawn'
+    ExcludedClass=StationaryPawn
+    HeatClass=Class'sgHeatBlue'
+    HeatSensingRange=16384.00
+    bVisorDeActivated=True
+    CacheInvs(0)=Class'Botpack.UT_invisibility'
+    CacheInvs(1)=Class'UnrealI.Dampener'
+    CacheInvs(2)=Class'Botpack.UT_Jumpboots'
+    CacheInvs(3)=Class'Botpack.UDamage'
+    CacheInvs(4)=Class'sgSpeed'
+    CacheInvs(5)=Class'UnrealShare.SCUBAGear'
+    CacheInvs(6)=Class'sgSuit'
+    CacheInvs(7)=Class'UnrealShare.Suits'
+    CacheInvs(8)=Class'sgTeleNetwork'
+    CacheInvs(9)=Class'sgVisor'
+    CacheTypes(1)=1
+    CacheTypes(2)=2
+    CacheTypes(3)=3
+    CacheTypes(4)=4
+    CacheTypes(5)=5
+    CacheTypes(6)=6
+    CacheTypes(7)=7
+    CacheTypes(8)=8
+    CacheTypes(9)=9
 }

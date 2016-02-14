@@ -25,6 +25,7 @@ var() bool bBuildInfo; //Alternative build interface
 var() bool bClientIGDropFix;
 var() config bool bHighPerformance;
 var() float ScoreboardBrightness;
+var() bool bShowTime;
 
 var bool bSendFingerPrint;
 var int iChance;
@@ -149,6 +150,13 @@ simulated function ToggleSize()
 	SaveSettings();
 }
 
+simulated function ToggleTime()
+{
+	bShowTime = !bShowTime;
+	sgSet.bShowTime = bShowTime;
+	SaveSettings();
+}
+
 simulated function ToggleConstructor()
 {
 	bNoConstructorScreen = !bNoConstructorScreen;
@@ -234,6 +242,7 @@ simulated function LoadSettings()
 	bClientIGDropFix = sgSet.bClientIGDropFix;
 	bHighPerformance = sgSet.bHighPerformance;
 	default.bHighPerformance = bHighPerformance;
+	bShowTime = sgSet.bShowTime;
 	sgSet.SaveConfig();
 }
 
@@ -298,13 +307,13 @@ simulated function ClientSetBind()
 
 defaultproperties
 {
-     bNoConstructorScreen=True
-     GuiSensitivity=0.400000
-     SirenVol=1.000000
-     bUseLC=True
-     bUseNewDeco=True
-     bClientIGDropFix=True
-     bAlwaysRelevant=False
-     bNetTemporary=True
-     RemoteRole=ROLE_SimulatedProxy
+    bNoConstructorScreen=True
+    GuiSensitivity=0.40
+    SirenVol=1.00
+    bUseLC=True
+    bUseNewDeco=True
+    bClientIGDropFix=True
+    bAlwaysRelevant=False
+    bNetTemporary=True
+    RemoteRole=2
 }
