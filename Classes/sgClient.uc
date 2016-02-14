@@ -298,13 +298,13 @@ simulated function ClientSetBind()
 
 defaultproperties
 {
-     SirenVol=1
-     bAlwaysRelevant=False
-     GuiSensitivity=0.4
-     bNetTemporary=True
-     RemoteRole=ROLE_SimulatedProxy
      bNoConstructorScreen=True
+     GuiSensitivity=0.400000
+     SirenVol=1.000000
      bUseLC=True
      bUseNewDeco=True
      bClientIGDropFix=True
+     bAlwaysRelevant=False
+     bNetTemporary=True
+     RemoteRole=ROLE_SimulatedProxy
 }

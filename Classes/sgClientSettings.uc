@@ -16,12 +16,11 @@ var() config bool bBuildInfo;
 var() config bool bClientIGDropFix;
 var() config bool bHighPerformance;
 var() config float ScoreboardBrightness;
-
+var() config bool bUseSmallGui;
 
 defaultproperties
 {
-     SirenVol=1
-     GuiSensitivity=0.4
-     bNoConstructorScreen=False
+     GuiSensitivity=0.400000
+     SirenVol=1.000000
      bBuildInfo=True
 }

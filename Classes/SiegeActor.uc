@@ -3,5 +3,5 @@ class SiegeActor expands Actor;
 
 defaultproperties
 {
-	bHidden=True
+     bHidden=True
 }
