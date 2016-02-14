@@ -1627,7 +1627,21 @@ simulated function DrawStatus(Canvas Canvas)
 		else if ( i/60 > 99 )
 			XL = 15;
  
-        // Draw in front of Frags
+        
+	
+		//Draw time by Sektor based on Higor timer
+		X = Canvas.ClipX - 128 * StatScale - 131 * Scale * Scale;
+        Y = 128 * Scale;
+		
+		Canvas.DrawColor = HUDColor;
+		Canvas.SetPos(X,Y);
+        Canvas.DrawTile(Texture'HUD_ClockBg', 128*Scale, 60*Scale, 0, 0, 128.0, 64.0);
+        Canvas.Style = Style;
+        Canvas.DrawColor = WhiteColor;
+        DrawTime(Canvas, X+3, Y);
+		//end Driwe time
+
+		// Draw in front of Frags
         if ( bHideStatus && bHideAllWeapons )
         {
             X = 0.5 * Canvas.ClipX - 384 * Scale - XL * Scale;
@@ -1639,11 +1653,14 @@ simulated function DrawStatus(Canvas Canvas)
             Y = 128 * Scale;
         }
 
-        Canvas.SetPos(X,Y);
+		Canvas.DrawColor = HUDColor;
+        Canvas.SetPos(X,Y+64);
         Canvas.DrawTile(Texture'HUD_ClockBg', 128*Scale + XL * Scale, 64*Scale, 0, 0, 128.0, 64.0);
         Canvas.Style = Style;
         Canvas.DrawColor = WhiteColor;
-        DrawTime(Canvas, X, Y, i, XL);
+        DrawTimer(Canvas, X, Y+64, i, XL);
+
+		
 	}
 }
 
@@ -1652,7 +1669,7 @@ simulated function DrawStatus(Canvas Canvas)
 //Higor:
 // FUK PURE, I MAKE HUDE WITH TIMERR UHAHUAHUAHUA
 // g0v woz ere
-simulated function DrawTime(Canvas Canvas, float X, float Y, int Seconds, float ExtraSize)
+simulated function DrawTimer(Canvas Canvas, float X, float Y, int Seconds, float ExtraSize)
 {
 	local int Min, Sec;
 	local float FullSize;
@@ -1680,6 +1697,33 @@ simulated function DrawTime(Canvas Canvas, float X, float Y, int Seconds, float 
 	Canvas.CurX -= 6 * Scale;
 	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, ((Sec/10)%10) *25, 0, 25.0, 64.0);
 	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, (Sec%10)*25, 0, 25.0, 64.0);
+}
+
+//*****************
+//Time by Sektor based on Higor:
+simulated function DrawTime(Canvas Canvas, float X, float Y)
+{
+	local int Hour, Min;
+	local float FullSize;
+	
+	Hour = PlayerPawn( Owner ).Level.Hour;
+	Min = PlayerPawn( Owner ).Level.Minute;
+
+	if ( Level.bHighDetailMode )
+		Canvas.Style = ERenderStyle.STY_Translucent;
+
+	FullSize = 25 * Scale * 4 + 16 * Scale; //At least 4 digits and : (extra size not counted)
+
+	Canvas.SetPos( X + 64 * Scale, Y + 12 * Scale);
+	Canvas.CurX -= (FullSize / 2);
+
+	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, ((Hour/10)%10) *25, 0, 25.0, 64.0);
+	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, (Hour%10)*25, 0, 25.0, 64.0);
+	Canvas.CurX -= 6 * Scale;
+	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, 25, 64, 25.0, 64.0); //DOUBLE DOT HERE
+	Canvas.CurX -= 6 * Scale;
+	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, ((Min/10)%10) *25, 0, 25.0, 64.0);
+	Canvas.DrawTile(Texture'BotPack.HudElements1', Scale*25, 64*Scale, (Min%10)*25, 0, 25.0, 64.0);
 }
 
 
@@ -1949,7 +1993,6 @@ simulated function Color NewColor( byte r, byte g, byte b )
 
 defaultproperties
 {
-	 HudItemSlotSpace=36
      GreyColor=(R=128,G=128,B=128)
      RedColour=128
      TheWhiteStuff=(R=255,G=255,B=255)
@@ -1970,17 +2013,28 @@ defaultproperties
      sgRankDesc(5)="The player who built the greatest number of warheads"
      sgRankDesc(6)="The player who killed the greatest number of warheads"
      sgRankDesc(7)="The player who repaired and upgraded the most"
-     CacheInvs(0)=Class'UT_Invisibility'
-     CacheInvs(1)=Class'Dampener'
-     CacheInvs(2)=Class'UT_JumpBoots'
-     CacheInvs(3)=Class'UDamage'
-     CacheInvs(4)=Class'sgSpeed'
-     CacheInvs(5)=Class'SCUBAGear'
-     CacheInvs(6)=Class'sgSuit'
-     CacheInvs(7)=Class'Suits'
-     CacheInvs(8)=Class'sgTeleNetwork'
-     CacheInvs(9)=Class'sgVisor'
-     CacheTypes(0)=0
+     TeamIcons(0)=Texture'sgUMedia.Icons.IconCoreRed'
+     TeamIcons(1)=Texture'sgUMedia.Icons.IconCoreBlue'
+     TeamIcons(2)=Texture'sgUMedia.Icons.IconCoreGreen'
+     TeamIcons(3)=Texture'sgUMedia.Icons.IconCoreGold'
+     HudItemSlotSpace=36.000000
+     bSeeAllHeat=True
+     bSeeBehindWalls=True
+     AffectedActorsClass=Class'Engine.Pawn'
+     ExcludedClass=StationaryPawn
+     HeatClass=Class'SiegeIV_0022.sgHeatBlue'
+     HeatSensingRange=16384.000000
+     bVisorDeActivated=True
+     CacheInvs(0)=Class'Botpack.UT_invisibility'
+     CacheInvs(1)=Class'UnrealI.Dampener'
+     CacheInvs(2)=Class'Botpack.UT_Jumpboots'
+     CacheInvs(3)=Class'Botpack.UDamage'
+     CacheInvs(4)=Class'SiegeIV_0022.sgSpeed'
+     CacheInvs(5)=Class'UnrealShare.SCUBAGear'
+     CacheInvs(6)=Class'SiegeIV_0022.sgSuit'
+     CacheInvs(7)=Class'UnrealShare.Suits'
+     CacheInvs(8)=Class'SiegeIV_0022.sgTeleNetwork'
+     CacheInvs(9)=Class'SiegeIV_0022.sgVisor'
      CacheTypes(1)=1
      CacheTypes(2)=2
      CacheTypes(3)=3
@@ -1990,15 +2044,4 @@ defaultproperties
      CacheTypes(7)=7
      CacheTypes(8)=8
      CacheTypes(9)=9
-     TeamIcons(0)=Texture'IconCoreRed'
-     TeamIcons(1)=Texture'IconCoreBlue'
-     TeamIcons(2)=Texture'IconCoreGreen'
-     TeamIcons(3)=Texture'IconCoreGold'
-	 bSeeAllHeat=True
-	 bSeeBehindWalls=True
-	 bVisorDeActivated=True
-	 AffectedActorsClass=Class'Pawn'
-	 ExcludedClass=StationaryPawn
-	 HeatClass=Class'sgHeatBlue'
-	 HeatSensingRange=16384.000000
 }
